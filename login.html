@@ -130,8 +130,7 @@ input[type=submit]:hover {
     display: block;
     text-align: center;
   }
-}
-</style>
+150px</style>
 </head>
 <body>
 <center>
@@ -140,7 +139,7 @@ input[type=submit]:hover {
 
 <div class="container">
 
-    <div class="row" style="width: 50%;">
+    <div class="row" style="width: 230px;">
       <h4 style="text-align:center">Login with Gmail </h4>
    
 
@@ -179,14 +178,15 @@ input[type=submit]:hover {
     // https://firebase.google.com/docs/web/setup#available-libraries
   
     // Your web app's Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyA3-6Ex2XDJJ16RStliz-NaN97nkfJySoE",
-      authDomain: "todo-c7c46.firebaseapp.com",
-      projectId: "todo-c7c46",
-      storageBucket: "todo-c7c46.appspot.com",
-      messagingSenderId: "997105917073",
-      appId: "1:997105917073:web:b2097c9bea9296ea853330"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyB87m7IcXd1gqnSYZEBXqwpQIQbOItRwqY",
+  authDomain: "todos-e7e2f.firebaseapp.com",
+  databaseURL: "https://todos-e7e2f-default-rtdb.firebaseio.com",
+  projectId: "todos-e7e2f",
+  storageBucket: "todos-e7e2f.appspot.com",
+  messagingSenderId: "523425205783",
+  appId: "1:523425205783:web:6fd93bb6f354c361541652"
+};
   
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
@@ -235,11 +235,6 @@ signInWithPopup(auth, provider)
     // ...
   }
 });
-
-// async function deleteCity(){
-
-//  await deleteDoc(doc(db, "cities", this.id));
-
 
 
 // 

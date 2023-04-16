@@ -87,7 +87,7 @@
 
 
         <!-- Core theme JS-->
-        <script type="module">
+<script type="module">
 
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.9.4/firebase-app.js";
@@ -130,145 +130,117 @@ onAuthStateChanged(auth, (user) => {
     }
   }
 });
+ 
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 } 
-
 function getParam(name) {
   name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
   var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
       results = regex.exec(location.search);
   return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 }
-var id = getParam('page')
-if(!id){
-id = 1
-}
-id=id*10
-var pt =0
-var paget=id -8
-console.log(paget)
-const q = query(collection(db, "shop"))
 
-const unsubscribe =  onSnapshot(q, (querySnapshot) => {
-    let table = document.getElementById('products')
-   table.innerHTML = ""
-   var dataItem=[]
-   var pageSum=0
-   var page =''
-   pt = pt+1
-  
- 
+var id = getParam('id');
+
+const q = query(collection(db, "shop"), where("catName", "==", id));
+
+const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  let table = document.getElementById('products');
+  table.innerHTML = "";
+  var dataItem = [];
   querySnapshot.forEach((doc) => {
-    pt = pt+1
-    
+    var product = "";
+    let data = doc.data();
+    let row = `
+      <div class="col mb-5">
+        <div class="card h-100">
+          <!-- Product image-->
+          <img class="card-img-top" src="${data.image}" width="250" height="200" alt="..." />
+          <!-- Product details-->
+          <div class="card-body p-4">
+            <div class="text-center">
+              <!-- Product name-->
+              <h5 class="fw-bolder">${data.itemName}</h5>
+              <!-- Product price-->
+              ${data.price}
+            </div>
+          </div>
+          <!-- Product actions-->
+          <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+            <div class="text-center"><a class=" btn-outline-dark mt-auto" href="product.html?id=${doc.id}" style="text-decoration:none">Discover Product</a></div>
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent"></div>
+            <div class="text-center"><a class="btn btn-outline-dark mt-auto" style="background:lightblue" id="${doc.id}">Add to cart</a></div>
+          </div>
+        </div>
+      </div>
+    `;
 
-//   console.log(doc.id, " => ", doc.data());
-var product = ""
+    let table = document.getElementById('products');
+    table.innerHTML += row;
+    dataItem.push(doc.id);
+    let addProduct = document.getElementsByClassName("btn btn-outline-dark mt-auto");
 
-let data = doc.data()
-var row  = `   <div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img class="card-img-top" src="${data.image}" width="250" height="200" alt="..." />
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder" >${data.itemName}</h5>
-                                    <!-- Product price-->
-                                    ${data.price}
-                                </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class=" btn-outline-dark mt-auto" href="product.html?id=${doc.id}" style="text-decoration:none">Discover Product</a></div>
-                                <div class="card-footer p-4 pt-0 border-top-0 bg-transparent"></div>
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" style="background:lightblue" id="${doc.id}">Add to cart</a></div>
-
-                            </div>
-                        </div>
-                    `;
-
-
-
-   let table = document.getElementById('products')
-   table.innerHTML += row
- dataItem.push(doc.id)
-      let addProduct = document.getElementsByClassName("btn btn-outline-dark mt-auto");
-   
-   for(var y=0;y<addProduct.length;y++){
-       
-    addProduct[y].myParam = dataItem[y]
-addProduct[y].addEventListener("click", add);
-}
- pageSum=pageSum+1
-  page +=`  <li class="page-item"><a class="page-link" href="index.html?page=${pageSum}">${pageSum}</a></li>`
-
-  
- 
+    for (var y = 0; y < addProduct.length; y++) {
+      addProduct[y].myParam = dataItem[y];
+      addProduct[y].addEventListener("click", add);
+    }
   });
-
- 
 });
 
 async function add(evt) {
-         var doc = false;
-                var sl = document.getElementById(this.id);
-                var t = evt.currentTarget.myParam;
-                
-                const q1 = query(collection(db, "cart"), (where("userId", "==", uid)));
-                const q2 = query(q1, (where("product", "==", this.id)));
-                
-                const querySnapshot = await getDocs(q2);
-                sl.disabled = true;
-                await sleep(300);
-                sl.disabled = false;
-                
-                if (querySnapshot.empty) {
-                    const docRef = await addDoc(collection(db, "cart"), {
-                        userId: uid,
-                        product: t
-                    }).then(function() {
-                        alert("Product successfully added!");
-                    }).catch(function(error) {
-                        alert("You Can't delete it because it's not yours");
-                    });
-                }
-            }
-            
-            // Update the small cart count
-            function smallCart() {
-                const q = query(collection(db, "cart"));
-                const q1 = query(q, where("userId", "==", uid));
-                
-                const unsubscribe = onSnapshot(q1, (querySnapshot) => {
-                    var sum = 0;
-                    querySnapshot.forEach((doc) => {
-                        let data = doc.data();
-                        if (data.product) {
-                            sum = sum + 1;
-                        }
-                    });
-                    document.getElementById("smallCart").innerHTML = sum;
-                });
-            }
-            
-            // Show the category menu
-            function showCategory() {
-                const q = query(collection(db, "category"));
-                
-                var menuc = "";
-                const unsubscribe = onSnapshot(q, (querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        let data = doc.data();
-                        console.log(doc.id);
-                        menuc = menuc + `<a class="dropdown-item" href="category.html?id=${doc.id}">${data.catName}</a>`;
-                    });
-                    document.getElementById("menug").innerHTML += menuc;
-                });
-            }
-        </script>
-    </body>
+  var doc = false
+  var sl = document.getElementById(this.id)
+  var t = evt.currentTarget.myParam
+  const q1 = query(collection(db, "cart"), (where("userId", "==", uid)))
+  const q2 = query(q1, (where("product", "==", this.id)))
+  const querySnapshot = await getDocs(q2)
+  sl.disabled = true
+  await sleep(300)
+  sl.disabled = false
+  if (querySnapshot.empty) {
+    const docRef = await addDoc(collection(db, "cart"), {
+      userId: uid,
+      product: t
+    })
+    .then(function() {
+      alert("Product successfully added!");
+    })
+    .catch(function(error) {
+      alert("You Can't delete it because it's not yours")
+    });
+  }
+}
+
+function smallCart() {
+  const q = query(collection(db, "cart"))
+  const q1 = query(q, where("userId", "==", uid))
+  const unsubscribe = onSnapshot(q1, (querySnapshot) => {
+    var sum = 0
+    querySnapshot.forEach((doc) => {
+      let data = doc.data()
+      if (data.product) {
+        sum = sum + 1
+      }
+    });
+    document.getElementById("smallCart").innerHTML = sum
+  });
+}
+
+function showCategory() {
+  const q = query(collection(db, "category"))
+  var menuc = ""
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    var sum = 0
+    querySnapshot.forEach((doc) => {
+      let data = doc.data()
+      console.log(doc.id)
+      menuc = menuc + `<a class="dropdown-item" href="category.html?id=${doc.id}">${data.catName}</a>`
+    });
+    document.getElementById("menug").innerHTML += menuc
+  });
+}
+</script>
+</body>
 </html>
